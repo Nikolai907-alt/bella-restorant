@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BELLA — Админ-панель</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+}
+
+.container {
+    width: 92%;
+    max-width: 800px;
+    margin: 30px auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+.card {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 13px;
+    margin: 7px 0;
+    border: none;
+    border-radius: 8px;
+    background: #2b2b2b;
+    color: white;
+    font-size: 16px;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.login-btn {
+    width: 100%;
+    background: white;
+    color: #111;
+}
+
+.add-btn {
+    width: 100%;
+    background: #25c76f;
+    color: white;
+}
+
+.save-btn {
+    width: 100%;
+    background: #3478f6;
+    color: white;
+}
+
+.cancel-btn {
+    width: 100%;
+    background: #555;
+    color: white;
+}
+
+.logout-btn {
+    width: 100%;
+    background: #444;
+    color: white;
+}
+
+.delete-btn {
+    background: #e53935;
+    color: white;
+}
+
+.edit-btn {
+    background: #ff9800;
+    color: white;
+}
+
+.dish {
+    background: #252525;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 12px;
+}
+
+.dish h3 {
+    margin: 0 0 8px;
+}
+
+.price {
+    color: #25c76f;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.category {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.dish img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.actions button {
+    flex: 1;
+}
+
+#adminPanel {
+    display: none;
+}
+
+#editMode {
+    display: none;
+    color: #4da3ff;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.message {
+    text-align: center;
+    margin-top: 10px;
+    color: #ffcc00;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div id="loginPanel" class="card">
+
+    <h1>🔐 BELLA Admin</h1>
+
+    <input
+        type="email"
+        id="email"
+        placeholder="Email администратора"
+    >
+
+    <input
+        type="password"
+        id="password"
+        placeholder="Пароль"
+    >
+
+    <button class="login-btn" onclick="login()">
+        Войти
+    </button>
+
+    <div id="loginMessage" class="message"></div>
+
+</div>
+
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+
+    <h1>🍽 BELLA Admin</h1>
+
+    <div class="card">
+
+        <div id="editMode">
+            ✏️ Редактирование блюда
+        </div>
+
+        <input
+            id="dishName"
+            type="text"
+            placeholder="Название блюда"
+        >
+
+        <input
+            id="dishPrice"
+            type="text"
+            placeholder="Цена, например 25 zł"
+        >
+
+        <textarea
+            id="dishDescription"
+            placeholder="Описание блюда"
+        ></textarea>
+
+        <input
+            id="dishImage"
+            type="text"
+            placeholder="Ссылка на фото"
+        >
+
+        <select id="dishCategory">
+
+            <option value="new">Новинки</option>
+            <option value="snacks">Закуски</option>
+            <option value="salads">Салаты</option>
+            <option value="soups">Супы</option>
+            <option value="hot">Горячие блюда</option>
+            <option value="pizza">Пицца</option>
+            <option value="fastfood">Фастфуд</option>
+            <option value="desserts">Десерты</option>
+
+            <option value="drinks">Напитки</option>
+            <option value="coffee">Кофе</option>
+            <option value="tea">Чай</option>
+            <option value="lemonades">Лимонады</option>
+
+        </select>
+
+        <button
+            id="addButton"
+            class="add-btn"
+            onclick="addDish()"
+        >
+            ➕ Добавить блюдо
+        </button>
+
+        <button
+            id="saveButton"
+            class="save-btn"
+            onclick="saveEdit()"
+            style="display:none"
+        >
+            💾 Сохранить изменения
+        </button>
+
+        <button
+            id="cancelButton"
+            class="cancel-btn"
+            onclick="cancelEdit()"
+            style="display:none"
+        >
+            ❌ Отменить
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>📋 Все блюда</h2>
+
+        <div id="dishes">
+            Загрузка...
+        </div>
+
+    </div>
+
+
+    <button
+        class="logout-btn"
+        onclick="logout()"
+    >
+        🚪 Выйти
+    </button>
+
+</div>
+
+</div>
+
+
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    setPersistence,
+    browserSessionPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    updateDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyA3YFrHFBS8QQZD15BpqqS1j5SQtZ0kDeE",
+
+    authDomain: "bella-ae79a.firebaseapp.com",
+
+    projectId: "bella-ae79a",
+
+    storageBucket: "bella-ae79a.firebasestorage.app",
+
+    messagingSenderId: "127734379674",
+
+    appId: "1:127734379674:web:c0351128cfb92aa63a9b23",
+
+    measurementId: "G-MC83PF9WW8"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+// =================================
+// ТОЛЬКО ДО ЗАКРЫТИЯ ВКЛАДКИ
+// =================================
+
+await setPersistence(
+    auth,
+    browserSessionPersistence
+);
+
+
+let editingId = null;
+
+
+// =================================
+// LOGIN
+// =================================
+
+window.login = async function() {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+
+    if (!email || !password) {
+
+        message.textContent =
+            "❌ Введите email и пароль";
+
+        return;
+    }
+
+
+    try {
+
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        message.textContent =
+            "✅ Вход выполнен!";
+
+    } catch (error) {
+
+        console.log(error);
+
+        message.textContent =
+            "❌ Неверный email или пароль";
+
+    }
+
+};
+
+
+// =================================
+// AUTH
+// =================================
+
+onAuthStateChanged(auth, user => {
+
+    if (user) {
+
+        document.getElementById("loginPanel")
+            .style.display = "none";
+
+        document.getElementById("adminPanel")
+            .style.display = "block";
+
+        loadDishes();
+
+    } else {
+
+        document.getElementById("loginPanel")
+            .style.display = "block";
+
+        document.getElementById("adminPanel")
+            .style.display = "none";
+
+    }
+
+});
+
+
+// =================================
+// ADD
+// =================================
+
+window.addDish = async function() {
+
+    const name =
+        document.getElementById("dishName").value.trim();
+
+    const price =
+        document.getElementById("dishPrice").value.trim();
+
+    const description =
+        document.getElementById("dishDescription").value.trim();
+
+    const image =
+        document.getElementById("dishImage").value.trim();
+
+    const category =
+        document.getElementById("dishCategory").value;
+
+
+    if (!name || !price) {
+
+        alert("Введите название и цену!");
+
+        return;
+    }
+
+
+    try {
+
+        await addDoc(
+            collection(db, "dishes"),
+            {
+                name,
+                price,
+                description,
+                image,
+                category,
+                createdAt: Date.now()
+            }
+        );
+
+
+        alert("✅ Блюдо добавлено!");
+
+        clearForm();
+
+        loadDishes();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Ошибка при добавлении");
+
+    }
+
+};
+
+
+// =================================
+// LOAD
+// =================================
+
+async function loadDishes() {
+
+    const container =
+        document.getElementById("dishes");
+
+    container.innerHTML = "Загрузка...";
+
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(db, "dishes")
+            );
+
+
+        container.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+            container.innerHTML =
+                "Пока нет блюд.";
+
+            return;
+        }
+
+
+        snapshot.forEach(dishDoc => {
+
+            const dish =
+                dishDoc.data();
+
+            const id =
+                dishDoc.id;
+
+
+            const div =
+                document.createElement("div");
+
+            div.className = "dish";
+
+
+            div.innerHTML = `
+
+                <h3>
+                    ${escapeHTML(dish.name || "")}
+                </h3>
+
+                <div class="price">
+                    ${escapeHTML(dish.price || "")}
+                </div>
+
+                <div class="category">
+                    Категория:
+                    ${escapeHTML(dish.category || "")}
+                </div>
+
+                <p>
+                    ${escapeHTML(dish.description || "")}
+                </p>
+
+                ${
+                    dish.image
+                    ?
+                    `<img src="${escapeAttribute(dish.image)}">`
+                    :
+                    ""
+                }
+
+                <div class="actions">
+
+                    <button
+                        class="edit-btn"
+                        onclick="editDish('${id}')"
+                    >
+                        ✏️ Изменить
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteDish('${id}')"
+                    >
+                        🗑️ Удалить
+                    </button>
+
+                </div>
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            "❌ Ошибка загрузки блюд";
+
+    }
+
+}
+
+
+// =================================
+// EDIT
+// =================================
+
+window.editDish = async function(id) {
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(db, "dishes")
+            );
+
+
+        let found = null;
+
+
+        snapshot.forEach(dishDoc => {
+
+            if (dishDoc.id === id) {
+
+                found = dishDoc.data();
+
+            }
+
+        });
+
+
+        if (!found) {
+
+            alert("Блюдо не найдено");
+
+            return;
+        }
+
+
+        editingId = id;
+
+
+        document.getElementById("dishName")
+            .value = found.name || "";
+
+        document.getElementById("dishPrice")
+            .value = found.price || "";
+
+        document.getElementById("dishDescription")
+            .value = found.description || "";
+
+        document.getElementById("dishImage")
+            .value = found.image || "";
+
+        document.getElementById("dishCategory")
+            .value = found.category || "new";
+
+
+        document.getElementById("editMode")
+            .style.display = "block";
+
+        document.getElementById("addButton")
+            .style.display = "none";
+
+        document.getElementById("saveButton")
+            .style.display = "block";
+
+        document.getElementById("cancelButton")
+            .style.display = "block";
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Ошибка");
+
+    }
+
+};
+
+
+// =================================
+// SAVE EDIT
+// =================================
+
+window.saveEdit = async function() {
+
+    if (!editingId) return;
+
+
+    const name =
+        document.getElementById("dishName").value.trim();
+
+    const price =
+        document.getElementById("dishPrice").value.trim();
+
+    const description =
+        document.getElementById("dishDescription").value.trim();
+
+    const image =
+        document.getElementById("dishImage").value.trim();
+
+    const category =
+        document.getElementById("dishCategory").value;
+
+
+    if (!name || !price) {
+
+        alert("Введите название и цену!");
+
+        return;
+    }
+
+
+    try {
+
+        await updateDoc(
+            doc(db, "dishes", editingId),
+            {
+                name,
+                price,
+                description,
+                image,
+                category,
+                updatedAt: Date.now()
+            }
+        );
+
+
+        alert("✅ Изменения сохранены!");
+
+        cancelEdit();
+
+        loadDishes();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Ошибка сохранения");
+
+    }
+
+};
+
+
+// =================================
+// DELETE
+// =================================
+
+window.deleteDish = async function(id) {
+
+    if (!confirm("Точно удалить это блюдо?")) {
+        return;
+    }
+
+
+    try {
+
+        await deleteDoc(
+            doc(db, "dishes", id)
+        );
+
+
+        alert("🗑️ Блюдо удалено!");
+
+        loadDishes();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Ошибка удаления");
+
+    }
+
+};
+
+
+// =================================
+// CANCEL
+// =================================
+
+window.cancelEdit = function() {
+
+    editingId = null;
+
+    clearForm();
+
+
+    document.getElementById("editMode")
+        .style.display = "none";
+
+    document.getElementById("addButton")
+        .style.display = "block";
+
+    document.getElementById("saveButton")
+        .style.display = "none";
+
+    document.getElementById("cancelButton")
+        .style.display = "none";
+
+};
+
+
+// =================================
+// CLEAR
+// =================================
+
+function clearForm() {
+
+    document.getElementById("dishName")
+        .value = "";
+
+    document.getElementById("dishPrice")
+        .value = "";
+
+    document.getElementById("dishDescription")
+        .value = "";
+
+    document.getElementById("dishImage")
+        .value = "";
+
+    document.getElementById("dishCategory")
+        .value = "new";
+
+}
+
+
+// =================================
+// LOGOUT
+// =================================
+
+window.logout = async function() {
+
+    await signOut(auth);
+
+};
+
+
+// =================================
+// SECURITY
+// =================================
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function escapeAttribute(text) {
+
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+
+}
+
+</script>
+
+</body>
+</html>

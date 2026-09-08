@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BELLA Restaurant</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+/* ГЛАВНАЯ */
+
+#home {
+    min-height: 100vh;
+    text-align: center;
+    padding-top: 100px;
+}
+
+.logo {
+    font-size: 52px;
+    font-weight: bold;
+    letter-spacing: 6px;
+}
+
+.subtitle {
+    color: #aaa;
+    letter-spacing: 5px;
+    margin-top: 5px;
+    margin-bottom: 60px;
+}
+
+.main-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 80%;
+    max-width: 350px;
+    margin: auto;
+}
+
+.main-buttons button {
+    background: white;
+    color: #111;
+    border: none;
+    padding: 18px;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* СТРАНИЦЫ */
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    background: #111;
+}
+
+.back {
+    background: #222;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+/* КАТЕГОРИИ */
+
+.categories {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #111;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    border-bottom: 1px solid #333;
+    min-height: 61px;
+}
+
+.categories::-webkit-scrollbar {
+    display: none;
+}
+
+.categories button {
+    flex-shrink: 0;
+    border: none;
+    color: white;
+    background: #222;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 15px;
+}
+
+/* РАЗДЕЛ */
+
+.section {
+    padding: 25px 15px;
+    scroll-margin-top: 75px;
+}
+
+.section-title {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+/* БЛЮДО */
+
+.dish {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    background: #1b1b1b;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    cursor: pointer;
+}
+
+.dish:active {
+    transform: scale(.98);
+}
+
+.dish-info {
+    flex: 1;
+}
+
+.dish-name {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.price {
+    margin-top: 7px;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+.description {
+    color: #999;
+    margin-top: 7px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.dish-image {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: #222;
+}
+
+/* ЗАГРУЗКА */
+
+.loading {
+    text-align: center;
+    color: #888;
+    padding: 30px;
+}
+
+.error {
+    text-align: center;
+    color: #ff7777;
+    padding: 30px 15px;
+}
+
+/* MODAL */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.88);
+    z-index: 5000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-box {
+    width: 100%;
+    max-width: 450px;
+    background: #1b1b1b;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+}
+
+.modal-image {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    background: #222;
+}
+
+.close {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0,0,0,.75);
+    color: white;
+    font-size: 26px;
+}
+
+.modal-content {
+    padding: 20px;
+}
+
+.modal-title {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.modal-price {
+    font-size: 19px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.modal-heading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 7px;
+}
+
+.modal-text {
+    color: #bbb;
+    line-height: 1.5;
+    font-size: 15px;
+}
+
+footer {
+    text-align: center;
+    color: #777;
+    padding: 40px 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ГЛАВНАЯ -->
+
+<div id="home">
+
+    <div class="logo">BELLA</div>
+
+    <div class="subtitle">RESTAURANT</div>
+
+    <div class="main-buttons">
+
+        <button onclick="openPage('menu')">
+            🍽 Меню
+        </button>
+
+        <button onclick="openPage('bar')">
+            🍹 Бар
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- МЕНЮ -->
+
+<div id="menu" class="page">
+
+    <div class="top">
+
+        <button class="back" onclick="goHome()">
+            ← Назад
+        </button>
+
+        <div class="title">
+            Меню
+        </div>
+
+    </div>
+
+
+    <div class="categories">
+
+        <button onclick="goToSection('new')">
+            Новинки
+        </button>
+
+        <button onclick="goToSection('snacks')">
+            Закуски
+        </button>
+
+        <button onclick="goToSection('salads')">
+            Салаты
+        </button>
+
+        <button onclick="goToSection('soups')">
+            Супы
+        </button>
+
+        <button onclick="goToSection('hot')">
+            Горячие
+        </button>
+
+        <button onclick="goToSection('pizza')">
+            Пицца
+        </button>
+
+        <button onclick="goToSection('fastfood')">
+            Фастфуд
+        </button>
+
+        <button onclick="goToSection('desserts')">
+            Десерты
+        </button>
+
+    </div>
+
+
+    <div id="menuContent">
+
+        <div class="loading">
+            Загрузка меню...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- БАР -->
+
+<div id="bar" class="page">
+
+    <div class="top">
+
+        <button class="back" onclick="goHome()">
+            ← Назад
+        </button>
+
+        <div class="title">
+            Бар
+        </div>
+
+    </div>
+
+
+    <div class="categories">
+
+        <button onclick="goToSection('drinks')">
+            Напитки
+        </button>
+
+        <button onclick="goToSection('coffee')">
+            Кофе
+        </button>
+
+        <button onclick="goToSection('tea')">
+            Чай
+        </button>
+
+        <button onclick="goToSection('lemonades')">
+            Лимонады
+        </button>
+
+    </div>
+
+
+    <div id="barContent">
+
+        <div class="loading">
+            Загрузка бара...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ОКНО БЛЮДА -->
+
+<div id="dishModal" class="modal">
+
+    <div class="modal-box">
+
+        <button class="close" onclick="closeDish()">
+            ×
+        </button>
+
+        <img
+            id="modalImage"
+            class="modal-image"
+            src=""
+            alt="">
+
+        <div class="modal-content">
+
+            <div
+                id="modalTitle"
+                class="modal-title">
+            </div>
+
+            <div
+                id="modalPrice"
+                class="modal-price">
+            </div>
+
+
+            <div class="modal-heading">
+                Описание
+            </div>
+
+            <div
+                id="modalDescription"
+                class="modal-text">
+            </div>
+
+
+            <div class="modal-heading">
+                Ингредиенты
+            </div>
+
+            <div
+                id="modalIngredients"
+                class="modal-text">
+            </div>
+
+
+            <div class="modal-heading">
+                Аллергены
+            </div>
+
+            <div
+                id="modalAllergens"
+                class="modal-text">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<footer>
+    BELLA Restaurant
+</footer>
+
+
+<script type="module">
+
+/* FIREBASE */
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyA3YFrHFBS8QQZD15BpqqS1j5SQtZ0kDeE",
+
+    authDomain: "bella-ae79a.firebaseapp.com",
+
+    projectId: "bella-ae79a",
+
+    storageBucket: "bella-ae79a.firebasestorage.app",
+
+    messagingSenderId: "127734379674",
+
+    appId: "1:127734379674:web:c0351128cfb92aa63a9b23",
+
+    measurementId: "G-MC83PF9WW8"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+/* НАЗВАНИЯ КАТЕГОРИЙ */
+
+const categoryNames = {
+
+    new: "Новинки",
+
+    snacks: "Закуски",
+
+    salads: "Салаты",
+
+    soups: "Супы",
+
+    hot: "Горячие блюда",
+
+    pizza: "Пицца",
+
+    fastfood: "Фастфуд",
+
+    desserts: "Десерты",
+
+    drinks: "Напитки",
+
+    coffee: "Кофе",
+
+    tea: "Чай",
+
+    lemonades: "Лимонады"
+
+};
+
+
+/* ПОЛУЧЕНИЕ БЛЮД */
+
+async function getDishes() {
+
+    const snapshot =
+        await getDocs(
+            collection(db, "dishes")
+        );
+
+    const dishes = [];
+
+    snapshot.forEach(item => {
+
+        dishes.push({
+            id: item.id,
+            ...item.data()
+        });
+
+    });
+
+    return dishes;
+
+}
+
+
+/* СОЗДАНИЕ КАРТОЧКИ */
+
+function createDish(dish) {
+
+    const element =
+        document.createElement("div");
+
+    element.className = "dish";
+
+
+    element.onclick = function() {
+
+        openDish(
+            dish.name || "Блюдо",
+            dish.price || "",
+            dish.description || "Описание отсутствует",
+            dish.ingredients || "Не указано",
+            dish.allergens || "Не указано",
+            dish.image || ""
+        );
+
+    };
+
+
+    const info =
+        document.createElement("div");
+
+    info.className = "dish-info";
+
+
+    const name =
+        document.createElement("div");
+
+    name.className = "dish-name";
+
+    name.textContent =
+        dish.name || "Блюдо";
+
+
+    const price =
+        document.createElement("div");
+
+    price.className = "price";
+
+    price.textContent =
+        dish.price || "";
+
+
+    const description =
+        document.createElement("div");
+
+    description.className = "description";
+
+    description.textContent =
+        dish.description || "";
+
+
+    info.appendChild(name);
+
+    info.appendChild(price);
+
+    info.appendChild(description);
+
+
+    element.appendChild(info);
+
+
+    if (dish.image) {
+
+        const image =
+            document.createElement("img");
+
+        image.className =
+            "dish-image";
+
+        image.src =
+            dish.image;
+
+        image.alt =
+            dish.name || "Блюдо";
+
+        image.onerror =
+            function() {
+
+                this.style.display = "none";
+
+            };
+
+        element.appendChild(image);
+
+    }
+
+
+    return element;
+
+}
+
+
+/* ЗАГРУЗКА МЕНЮ */
+
+async function loadMenu() {
+
+    const container =
+        document.getElementById("menuContent");
+
+    try {
+
+        const dishes =
+            await getDishes();
+
+        container.innerHTML = "";
+
+
+        const menuCategories = [
+
+            "new",
+            "snacks",
+            "salads",
+            "soups",
+            "hot",
+            "pizza",
+            "fastfood",
+            "desserts"
+
+        ];
+
+
+        menuCategories.forEach(category => {
+
+            const categoryDishes =
+                dishes.filter(
+                    dish =>
+                    dish.category === category
+                );
+
+
+            if (categoryDishes.length === 0) {
+                return;
+            }
+
+
+            const section =
+                document.createElement("div");
+
+            section.className =
+                "section";
+
+            section.id =
+                category;
+
+
+            const title =
+                document.createElement("div");
+
+            title.className =
+                "section-title";
+
+            title.textContent =
+                categoryNames[category];
+
+
+            section.appendChild(title);
+
+
+            categoryDishes.forEach(dish => {
+
+                section.appendChild(
+                    createDish(dish)
+                );
+
+            });
+
+
+            container.appendChild(section);
+
+        });
+
+
+        if (container.innerHTML === "") {
+
+            container.innerHTML =
+                '<div class="loading">Меню пока пустое</div>';
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            '<div class="error">❌ Не удалось загрузить меню</div>';
+
+    }
+
+}
+
+
+/* ЗАГРУЗКА БАРА */
+
+async function loadBar() {
+
+    const container =
+        document.getElementById("barContent");
+
+    try {
+
+        const dishes =
+            await getDishes();
+
+        container.innerHTML = "";
+
+
+        const barCategories = [
+
+            "drinks",
+            "coffee",
+            "tea",
+            "lemonades"
+
+        ];
+
+
+        barCategories.forEach(category => {
+
+            const categoryDishes =
+                dishes.filter(
+                    dish =>
+                    dish.category === category
+                );
+
+
+            if (categoryDishes.length === 0) {
+                return;
+            }
+
+
+            const section =
+                document.createElement("div");
+
+            section.className =
+                "section";
+
+            section.id =
+                category;
+
+
+            const title =
+                document.createElement("div");
+
+            title.className =
+                "section-title";
+
+            title.textContent =
+                categoryNames[category];
+
+
+            section.appendChild(title);
+
+
+            categoryDishes.forEach(dish => {
+
+                section.appendChild(
+                    createDish(dish)
+                );
+
+            });
+
+
+            container.appendChild(section);
+
+        });
+
+
+        if (container.innerHTML === "") {
+
+            container.innerHTML =
+                '<div class="loading">Бар пока пуст</div>';
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            '<div class="error">❌ Не удалось загрузить бар</div>';
+
+    }
+
+}
+
+
+/* НАВИГАЦИЯ */
+
+window.openPage = function(page) {
+
+    const home =
+        document.getElementById("home");
+
+    const menu =
+        document.getElementById("menu");
+
+    const bar =
+        document.getElementById("bar");
+
+
+    home.style.display = "none";
+
+    menu.classList.remove("active");
+    menu.style.display = "none";
+
+    bar.classList.remove("active");
+    bar.style.display = "none";
+
+
+    if (page === "menu") {
+
+        menu.classList.add("active");
+
+        menu.style.display = "block";
+
+        loadMenu();
+
+    }
+
+
+    if (page === "bar") {
+
+        bar.classList.add("active");
+
+        bar.style.display = "block";
+
+        loadBar();
+
+    }
+
+
+    window.scrollTo(0, 0);
+
+};
+
+
+window.goHome = function() {
+
+    const home =
+        document.getElementById("home");
+
+    const menu =
+        document.getElementById("menu");
+
+    const bar =
+        document.getElementById("bar");
+
+
+    menu.classList.remove("active");
+    menu.style.display = "none";
+
+    bar.classList.remove("active");
+    bar.style.display = "none";
+
+    home.style.display = "block";
+
+
+    window.scrollTo(0, 0);
+
+};
+
+
+/* ПЕРЕХОД К КАТЕГОРИИ */
+
+window.goToSection = function(id) {
+
+    const section =
+        document.getElementById(id);
+
+    if (!section) {
+        return;
+    }
+
+
+    const position =
+        section.getBoundingClientRect().top +
+        window.pageYOffset -
+        70;
+
+
+    window.scrollTo({
+
+        top: position,
+
+        behavior: "smooth"
+
+    });
+
+};
+
+
+/* ОТКРЫТЬ БЛЮДО */
+
+window.openDish = function(
+    title,
+    price,
+    description,
+    ingredients,
+    allergens,
+    image
+) {
+
+    document.getElementById(
+        "modalTitle"
+    ).textContent = title;
+
+
+    document.getElementById(
+        "modalPrice"
+    ).textContent = price;
+
+
+    document.getElementById(
+        "modalDescription"
+    ).textContent = description;
+
+
+    document.getElementById(
+        "modalIngredients"
+    ).textContent = ingredients;
+
+
+    document.getElementById(
+        "modalAllergens"
+    ).textContent = allergens;
+
+
+    const modalImage =
+        document.getElementById("modalImage");
+
+
+    if (image) {
+
+        modalImage.src = image;
+
+        modalImage.style.display = "block";
+
+    } else {
+
+        modalImage.style.display = "none";
+
+    }
+
+
+    document
+        .getElementById("dishModal")
+        .classList.add("active");
+
+
+    document.body.style.overflow =
+        "hidden";
+
+};
+
+
+/* ЗАКРЫТЬ БЛЮДО */
+
+window.closeDish = function() {
+
+    document
+        .getElementById("dishModal")
+        .classList.remove("active");
+
+
+    document.body.style.overflow = "";
+
+};
+
+
+/* ЗАКРЫТИЕ ПО ФОНУ */
+
+document
+    .getElementById("dishModal")
+    .onclick = function(event) {
+
+        if (event.target === this) {
+
+            closeDish();
+
+        }
+
+    };
+
+
+/* ESC */
+
+document.onkeydown =
+    function(event) {
+
+        if (event.key === "Escape") {
+
+            closeDish();
+
+        }
+
+    };
+
+</script>
+
+</body>
+</html>
